@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <board id="lc01">
+        <phyaddr>0x18</phyaddr>
+        <netport>
+            <port  id="0"> 
+                <desc>bmc</desc> 
+                <qmode>3</qmode>
+                <pvid>9</pvid>
+            </port>
+            <port  id="1">
+                <desc>scm0</desc> 
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+                <portbasevlan>0,5,6,7,8,9,10</portbasevlan>
+            </port>
+            <port  id="2"> 
+                <desc>scm1</desc>
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+                <portbasevlan>0,5,6,7,8,9,10</portbasevlan>
+            </port>
+            <port  id="3"> 
+                <desc>cmm0</desc>
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+                <portbasevlan>0,5,6,7,8,9,10</portbasevlan>
+            </port>
+            <port  id="4">
+                <desc>cmm1</desc>
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+                <portbasevlan>0,5,6,7,8,9,10</portbasevlan>
+            </port>
+            <port  id="5"> 
+                <desc>nps0 debug</desc>
+                <qmode>3</qmode>
+                <pvid>10</pvid>
+            </port>
+            <port  id="6"> 
+                <desc>nps1 debug</desc>
+                <qmode>3</qmode>
+                <pvid>10</pvid>
+            </port>
+            <port  id="7"> 
+                <desc>rj45</desc>
+                <qmode>3</qmode>
+                <pvid>7</pvid>
+            </port>
+            <port  id="8"> 
+                <desc>CPU</desc>
+                <qmode>3</qmode>
+                <pvid>9</pvid>
+            </port>
+            <port  id="9"> 
+                <desc>nps0 service</desc>
+                <qmode>3</qmode>
+                <pvid>11</pvid>
+            </port> 
+            <port  id="10"> 
+                <desc>nps1 service</desc>
+                <qmode>3</qmode>
+                <pvid>11</pvid>
+            </port>              
+        </netport>
+        <vlanentry>
+            <entry>
+                <desc>VID_LC_DEBUG</desc>
+                <vid>7</vid>
+                <sid>0</sid>
+                <fid>7</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>1,3,3,3,3,1,1,1,1,3,3</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_SCM2LC</desc>
+                <vid>8</vid>
+                <sid>0</sid>
+                <fid>8</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>1,1,1,1,1,1,1,3,1,3,3</memberport>      
+            </entry>
+            <entry>
+                <desc>VID_LC_LC2SCM</desc>
+                <vid>9</vid>
+                <sid>0</sid>
+                <fid>9</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>1,1,1,1,1,1,1,1,1,3,3</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_NPS2CPU_DEBUG</desc>
+                <vid>10</vid>
+                <sid>0</sid>
+                <fid>10</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>1,3,3,3,3,1,1,3,1,3,3</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_CPU2NPS_SERV</desc>
+                <vid>11</vid>
+                <sid>0</sid>
+                <fid>11</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,3,3,3,3,3,3,3,1,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_NPS_WDT</desc>
+                <vid>12</vid>
+                <sid>0</sid>
+                <fid>12</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,3,3,3,3,3,3,3,1,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VLAN_BRO</desc>
+                <calcfunc>1</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,2,2,2,2,3,3,3,1,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VLAN_BRO_LC_CPU</desc>
+                <calcfunc>2</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,2,2,2,2,3,3,3,1,3,3</memberport>          
+            </entry>
+            <entry>
+                <desc>VLAN_BRO_LC_NPS</desc>
+                <calcfunc>3</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,2,2,2,2,3,3,3,1,3,3</memberport>          
+            </entry>  
+            <entry>
+                <desc>UNI_CPU</desc>
+                <calcfunc>4</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,2,2,2,2,3,3,3,1,3,3</memberport>          
+            </entry>
+            <entry>
+                <desc>UNI_NPS0</desc>
+                <calcfunc>5</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,2,2,2,2,3,3,3,1,3,3</memberport>          
+            </entry> 
+            <entry>
+                <desc>UNI_NPS1</desc>
+                <calcfunc>6</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,2,2,2,2,3,3,3,1,3,3</memberport>          
+            </entry>                                                        
+        </vlanentry>
+    </board>
+    <board id="lc02">
+        <phyaddr>0x11</phyaddr>
+        <netport>
+            <port  id="0"> 
+                <desc>scm</desc> 
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+            </port>
+            <port  id="1">
+                <desc>COMe</desc> 
+                <qmode>3</qmode>
+                <pvid>9</pvid>
+            </port>
+            <port  id="2"> 
+                <desc>cmm0</desc>
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+                <portbasevlan>1,2,4,5,6,7,8,9</portbasevlan>
+            </port>
+            <port  id="3"> 
+                <desc>cmm1</desc>
+                <qmode>3</qmode>
+                <pvid>8</pvid>
+                <portbasevlan>1,3,4,5,6,7,8,9</portbasevlan>
+            </port>
+            <port  id="4">
+                <desc>NPS0 debug</desc>
+                <qmode>3</qmode>
+                <pvid>10</pvid>
+            </port>
+            <port  id="5"> 
+                <desc>nps1 debug/DPI</desc>
+                <qmode>3</qmode>
+                <pvid>10</pvid>
+            </port>
+            <port  id="6"> 
+                <desc>DPI</desc>
+                <qmode>3</qmode>
+                <pvid>9</pvid>
+            </port>
+            <port  id="7"> 
+                <desc>TH(NPS)</desc>
+                <qmode>3</qmode>
+                <pvid>11</pvid>
+            </port>
+            <port  id="8"> 
+                <desc>DPI3</desc>
+                <qmode>3</qmode>
+                <pvid>9</pvid>
+            </port>
+            <port  id="9"> 
+                <desc>bmc</desc>
+                <qmode>3</qmode>
+                <pvid>9</pvid>
+            </port>              
+        </netport>
+        <vlanentry>
+            <entry>
+                <desc>VID_LC_DEBUG</desc>
+                <vid>7</vid>
+                <sid>0</sid>
+                <fid>7</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,1,3,3,1,1,1,3,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_SCM2LC</desc>
+                <vid>8</vid>
+                <sid>0</sid>
+                <fid>8</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>1,1,1,1,3,3,1,3,1,1</memberport>      
+            </entry>
+            <entry>
+                <desc>VID_LC_LC2SCM</desc>
+                <vid>9</vid>
+                <sid>0</sid>
+                <fid>9</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>1,1,1,1,1,1,1,3,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_NPS2CPU_DEBUG</desc>
+                <vid>10</vid>
+                <sid>0</sid>
+                <fid>10</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,1,3,3,1,1,1,3,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_CPU2NPS_SERV</desc>
+                <vid>11</vid>
+                <sid>0</sid>
+                <fid>11</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,1,3,3,3,3,1,1,1,3</memberport>          
+            </entry>
+            <entry>
+                <desc>VID_LC_NPS_WDT</desc>
+                <vid>12</vid>
+                <sid>0</sid>
+                <fid>12</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>3,1,3,3,3,3,1,1,3,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VLAN_BRO</desc>
+                <calcfunc>1</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,1,2,2,3,3,1,1,1,1</memberport>          
+            </entry>
+            <entry>
+                <desc>VLAN_BRO_LC_CPU</desc>
+                <calcfunc>2</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,1,2,2,3,3,1,3,1,3</memberport>          
+            </entry>
+            <entry>
+                <desc>VLAN_BRO_LC_NPS</desc>
+                <calcfunc>3</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,1,2,2,3,3,3,3,1,3</memberport>          
+            </entry>  
+            <entry>
+                <desc>UNI_CPU</desc>
+                <calcfunc>4</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,1,2,2,3,3,3,3,3,3</memberport>          
+            </entry>
+            <entry>
+                <desc>UNI_NPS</desc>
+                <calcfunc>5</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,3,2,2,3,3,3,3,1,3</memberport>          
+            </entry> 
+            <entry>
+                <desc>UNI_DPI</desc>
+                <calcfunc>6</calcfunc>
+                <sid>0</sid>
+                <fid>0</fid>
+                <vidPolicy>0</vidPolicy>
+                <memberport>2,3,2,2,3,3,1,1,1,3</memberport>          
+            </entry>                                                        
+        </vlanentry>
+    </board>
+</root>

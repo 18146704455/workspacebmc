@@ -1,0 +1,10 @@
+#!/bin/bash
+
+/usr/sbin/process.sh &
+
+#just for debug
+#/script/copc_net.sh C
+sleep 5
+#/script/uart.sh
+exit 0
+

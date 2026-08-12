@@ -1,0 +1,155 @@
+{
+	"atu":	{
+		"desc":	"Show atu commands",
+		"help":	"atu help [subcmd]: Display atu command options\n",
+		"subcmd":	{
+			"addEntry":	{
+				"help":	"atu addEntry [options] : Creates the new entry in MAC address table\n",
+				"paraList":	{
+					"[options](default value for option item is 0):":	{
+						"":	"options for atu entry, format as: -macAddr aabbccddee00 -state 7\n",
+						"-macAddr":	"mac address, format as aabbccddee00\n",
+						"-lag":	"trunk member or LAG\n",
+						"-portVec":	"port vector\n",
+						"-fid":	"ATU MAC Address Database number\n",
+						"-state":	"atu entry state\n",
+						"-FPri":	"MAC frame priority data\n"
+					}
+				},
+				"example":	{
+					"":	"atu addentry -macaddr 112233445566 -state 0xe -portvec 3 -fid 1\n"
+				}
+			},
+			"dump":	{
+				"help":	"atu dump <fid> : Find all MAC address in the specified fid and print them out\n",
+				"paraList":	{
+					"fid":	"ATU MAC Address Database Number\n"
+				},
+				"example":	{
+					"":	"atu dump 1\n"
+				}
+			}
+		}
+	},
+	"port":	{
+		"desc":	"Show port commands",
+		"help":	"port help [subcmd]: Display port command options\n",
+		"subcmd":	{
+			"setDefVid":	{
+				"help":	"port setDefVid <port> <vid> : Set the port default vlan id\n",
+				"paraList":	{
+					"port":	"logical port number to set\n",
+					"vid":	"the port vlan id\n"
+				},
+				"example":	{
+					"":	"port setDefVid 0 1\n"
+				}
+			},
+			"getPortStatus": {
+				"help": "port getPortStatus <portList> : Get ports link/Speed/Duplex/FlowControl status\n",
+				"paraList": {
+					"portList": "logical port number list, format support as 1,3,6/all/1-9 \n"
+				},
+				"example": {
+					"": "port getPortStatus all\n"
+				}
+			},
+			"set_an": {
+				"help": "port set_an an : set ports auto-negotiating 0 or 1\n",
+				"paraList": {
+					"portList": "logical port number list, format support as 1,3,6/all/1-9 \n",
+					"an": "0 disable 1 enable"
+				},
+				"example": {
+					"": "port set_an 1\n"
+				}
+			},
+			"get_an": {
+				"help": "port get_an <port> : Get ports auto-negotiating status\n",
+				"paraList": {
+					"portList": "logical port number list, format support as 1,3,6/all/1-9 \n"
+				},
+				"example": {
+					"": "port get_an all\n"
+				}
+			}
+		}
+	},
+	"vlan":	{
+		"desc":	"Show vtu commands",
+		"help":	"vlan help [subcmd]: Display vtu command options\n",
+		"subcmd":	{
+			"dump":	{
+				"help":	"vlan dump : Find all the vlan entries and print them out\n",
+				"paraList":	{
+				},
+				"example":	{
+					"":	"vlan dump\n"
+				}
+			}
+		}
+	},
+	"mib":	{
+		"desc":	"Show mib commands",
+		"help":	"mib help [subcmd]: Display mib command options\n",
+		"subcmd":	{
+			"flush":	{
+				"help":	"mib flush : Flush All MIBs counters for all ports\n",
+				"paraList":	{
+				},
+				"example":	{
+					"":	"mib flush\n"
+				}
+			},
+			"flushport":	{
+				"help":	"mib flushport <port> : Flush All MIBs counters for a given port\n",
+				"paraList":	{
+					"port":	"logical port number \n"
+				},
+				"example":	{
+					"":	"mib flushport 0\n"
+				}
+			},
+			"getPortAllCounter":	{
+				"help":	"mib getPortAllCounter <port> : Gets all MIBs counters of the given port\n",
+				"paraList":	{
+					"port":	"logical port number \n"
+				},
+				"example":	{
+					"":	"mib getPortAllCounter 0\n"
+				}
+			},
+			"getHistogramMode":	{
+				"help":	"mib getHistogramMode : Gets the Histogram Counters Mode\n",
+				"paraList":	{
+				},
+				"example":	{
+					"":	"mib getHistogramMode\n"
+				}
+			},
+			"setHistogramMode":	{
+				"help":	"mib setHistogramMode <mode>: Sets the Histogram Counters Mode\n",
+				"paraList":	{
+					"mode":	{
+						"":	"Histogram Mode:\n",
+						"":	"1: MSD_COUNT_RX_ONLY\n",
+						"":	"2: MSD_COUNT_TX_ONLY\n",
+						"":	"3: MSD_COUNT_RX_TX\n"
+					}
+				},
+				"example":	{
+					"":	"mib setHistogramMode 1\n"
+				}
+			},
+			"dump":	{
+				"help":	"mib dump <portList>: dump all the mibs information for specified port list\n",
+				"paraList":	{
+					"portList":	"logical port number list, format support as 1,3,5/all/1-4 \n"
+				},
+				"example":	{
+					"":	"mib dump all\n"
+				}
+			}
+		}
+	}
+}

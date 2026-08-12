@@ -1,0 +1,25 @@
+#!/bin/sh
+
+gpio_base=/sys/class/gpio
+#ko_path=/lib/modules/`uname -r`/kernel
+
+gpio_func(){
+    gpionum=$1
+    gpiofunc=$2
+    gpiovalue=$3
+
+    echo $gpionum >$gpio_base/export
+    echo $gpiofunc >$gpio_base/gpio"$gpionum"/direction
+    echo $gpiovalue >$gpio_base/gpio"$gpionum"/value
+}
+
+/usr/sbin/dev_func.sh
+/usr/sbin/i2c_device_register.sh
+sleep 2
+#/usr/sbin/nps.sh
+
+/usr/sbin/standby_init.sh
+sleep 2
+/usr/sbin/copc_power.sh
+
+exit 0

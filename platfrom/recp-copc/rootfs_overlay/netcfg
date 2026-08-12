@@ -1,0 +1,329 @@
+#!/bin/bash
+
+hextoip() {
+    hex=$1
+    ip1=`printf "%d" 0x${hex:6:2}`
+    ip2=`printf "%d." 0x${hex:4:2}`
+    ip3=`printf "%d." 0x${hex:2:2}`
+    ip4=`printf "%d." 0x${hex:0:2}`
+    ip=$ip4$ip3$ip2$ip1
+    echo $ip
+}
+
+iptohex() {
+    IFS=.
+    for str in $1
+    do
+        printf  "%02X" $str
+    done
+}
+
+echo 304 > /sys/class/gpio/export
+echo 305 > /sys/class/gpio/export
+echo 306 > /sys/class/gpio/export
+echo 307 > /sys/class/gpio/export
+echo 308 > /sys/class/gpio/export
+echo 309 > /sys/class/gpio/export
+echo 310 > /sys/class/gpio/export
+echo 311 > /sys/class/gpio/export
+
+echo 320 > /sys/class/gpio/export
+echo 332 > /sys/class/gpio/export
+echo 333 > /sys/class/gpio/export
+echo 334 > /sys/class/gpio/export
+
+echo in > /sys/class/gpio/gpio304/direction
+echo in > /sys/class/gpio/gpio305/direction
+echo in > /sys/class/gpio/gpio306/direction
+echo in > /sys/class/gpio/gpio307/direction
+echo in > /sys/class/gpio/gpio308/direction
+echo in > /sys/class/gpio/gpio309/direction
+echo in > /sys/class/gpio/gpio310/direction
+echo in > /sys/class/gpio/gpio311/direction
+
+echo in > /sys/class/gpio/gpio320/direction
+echo in > /sys/class/gpio/gpio332/direction
+echo in > /sys/class/gpio/gpio333/direction
+echo in > /sys/class/gpio/gpio334/direction
+
+
+slot_bit0=`cat /sys/class/gpio/gpio334/value |awk '{print}'`
+slot_bit1=`cat /sys/class/gpio/gpio333/value |awk '{print}'`
+slot_bit2=`cat /sys/class/gpio/gpio332/value |awk '{print}'`
+slot_bit3=`cat /sys/class/gpio/gpio320/value |awk '{print}'`
+slot_id_tmp=$slot_bit0$slot_bit1$slot_bit2$slot_bit3
+SLOT_ID="$((2#$slot_id_tmp))"
+echo $SLOT_ID
+
+#SLOT_ID=`cpld rd 0xfe21 | cut -d " " -f 2`
+
+local_ipaddr=`fw_printenv local_ipaddr   `
+local_netmask=`fw_printenv local_netmask  `
+local_gateway=`fw_printenv local_gateway  `
+local_ipsrc=`fw_printenv local_ipsrc    `
+local_mac=`fw_printenv local_mac      `
+
+[ -z $local_ipaddr ] && local_ipaddr=172.16.3.50
+[ -z $local_netmask ] && local_netmask=255.255.255.0
+[ -z $local_gateway ] && local_gateway=172.16.3.1
+[ -z $local_mac ]   && local_mac=58:41:72:68:00:01
+[ -z $local_ipsrc ]   && local_ipsrc=STATIC
+
+#IPADDR=${local_ipaddr#*=}${SLOT_ID:1:1}
+local_ipaddr=${local_ipaddr#*=}
+BASE_IP_HEX=$(iptohex $local_ipaddr)
+let "IPADDR=0x$BASE_IP_HEX + $SLOT_ID"
+let "MAC_END=0x21 + $SLOT_ID * 6 + 0"
+IPADDR=$(hextoip $(printf "%x" $IPADDR))
+MAC_END=$(printf "%02x" $MAC_END)
+
+IPSRC=${local_ipsrc#*=}
+NETMASK=${local_netmask#*=}
+GATEWAY=${local_gateway#*=}
+tmp_mac=${local_mac%:*}:$MAC_END
+MAC=${tmp_mac#*=}
+
+ETH_CONFIG=/etc/sysconfig/ifconfig.eth0
+
+echo "ONBOOT=yes" > ${ETH_CONFIG}
+echo "IFACE=eth0" >> ${ETH_CONFIG}
+echo "SERVICE=ipv4-static" >> ${ETH_CONFIG}
+echo "IP=$IPADDR" >> ${ETH_CONFIG}
+echo "PREFIX=24" >>${ETH_CONFIG}
+echo "HWADDR=$MAC" >> ${ETH_CONFIG}
+
+[ -x /etc/sysconfig/init.sh ] && /etc/sysconfig/init.sh || echo "0" >/dev/null
+ifup eth0
+error_log(){
+    read -s -n1 -p "ERROR $1 Press any key to continue ... "
+    echo ""
+}
+config_net_lc03(){
+    #bmc debug
+    phyw 0 0x10 0x1b 0x848b
+    phyw 0 0x10 0 0xb100
+
+    #bmc phy2
+    sw wr 0x15 1 0xc17e
+    phyw 1 0x10 0x16 1
+    phyw 1 0x10 0 0x8140
+
+    #come phy
+    sw wr 0x14 1 0xc17e
+    phyw 0 0x11 0x1b 0x9484 
+    phyw 0 0x11 0 0x8140 
+
+    #debug
+    #sw wr 0x16 1 0xc17e
+
+    #scm1
+    sw wr 0x10 1 0xc17e
+
+    #scm2 
+    sw wr 0x11 1 0xc17e
+
+    #cmm1
+    sw wr 0x12 1 0xc17e
+
+    #cmm2
+    sw wr 0x13 1 0xc17e
+
+    #tofino
+    sw wr 0x17 1 0xc17e
+
+    #nps0
+    sw wr 0x18 1 0xc17e
+
+    #nps1
+    sw wr 0x19 1 0xc17e
+
+    #enable Electronic drive.
+    cpld wr 0x20 0x1f
+}
+config_net_lc02v1(){
+    #bmc phy2
+    sw wr 0x19 1 0xc17e     
+    phyw 1 0x10 0x16 1      
+    phyw 1 0x10 0x9 0x300   
+    phyw 1 0x10 0 8140          
+
+    #CMM1/debug
+    sw wr 0x12 1 0xc13c         
+    phyw 0 0x10 0x1b 0x9484     
+    phyw 0 0x10 0 0x8100  
+
+    sw wr 0x11 1 0xc17e     
+    phyw 0 0x14 0x1b 0x9484 
+    phyw 0 0x14 0 0x8140 
+
+    #TH
+    sw wr 0x17 1 0xc17e     
+
+    #scm
+    sw wr 0x10 1 0xc17e
+
+    #cmm2
+    sw wr 0x13 1 0xc17e
+
+    #socket 0~2,3
+    sw wr 0x14 1 0xc17e
+    sw wr 0x15 1 0xc17e
+    sw wr 0x16 1 0xc17e
+    sw wr 0x18 1 0xc17e
+    #scm1/SCM2选通
+    cpld wr 0x20 0x19
+}
+
+config_net_lc02v2(){
+
+    #CMM1/debug
+    sw wr 0x12 1 0xc17e         
+    phyw 0 0x10 0x1b 0x9484     
+    phyw 0 0x10 0 0x8100  
+
+    sw wr 0x11 1 0xc17e     
+    phyw 0 0x11 0x1b 0x9484 
+    phyw 0 0x11 0 0x8140 
+
+    #TH
+    sw wr 0x17 1 0xc17e     
+
+    #scm
+    sw wr 0x10 1 0xc17e
+    sw wr 0x16 1 0xc17e
+
+    #cmm2
+    sw wr 0x13 1 0xc17e
+
+    #socket 0~2,3
+    sw wr 0x14 1 0xc17e
+    sw wr 0x15 1 0xc17e
+    sw wr 0x18 1 0xc17e
+    cpld wr 0x20 0x1f
+
+    #bmc phy2
+    sw wr 0x19 1 0xc17e     
+    phyw 1 0x10 0x16 1      
+    phyw 1 0x10 0x9 0x300   
+    phyw 1 0x10 0 8140          
+}
+
+
+config_net_lcb(){
+    #switch88e6185
+    sw wr 0x10 1 0xc17e
+    sw wr 0x11 1 0xc17e
+    sw wr 0x12 1 0xc17e
+    sw wr 0x13 1 0xc17e
+    sw wr 0x14 1 0xc17e
+    sw wr 0x15 1 0xc17e
+    sw wr 0x16 1 0xc17e
+    sw wr 0x17 1 0xc17e
+    sw wr 0x18 1 0xc17e
+    sw wr 0x19 1 0xc17e
+
+    #phy0x07 bus0
+    phyw 0 7 1e a000
+    phyw 0 7 1f 2
+    phyw 0 7 0 8140
+    phyw 0 7 1e a000
+    phyw 0 7 1f 0
+
+    #phy0x03 bus0 
+    phyw 0 3 1e a001
+    phyw 0 3 1f 8043
+    phyw 0 3 1e 51
+    phyw 0 3 1f 879
+    phyw 0 3 1e a000
+    phyw 0 3 1f 2
+    phyw 0 3 0 8140
+}
+
+config_net_copc(){
+
+    #switch88e6185
+    sw wr 0x10 1 0xc17e
+    sw wr 0x11 1 0xc17e
+    sw wr 0x12 1 0xc17e
+    sw wr 0x13 1 0xc17e
+    sw wr 0x14 1 0xc17e
+    sw wr 0x15 1 0xc17e
+    sw wr 0x16 1 0xc17e
+    sw wr 0x17 1 0xc17e
+    sw wr 0x18 1 0xc17e
+    sw wr 0x19 1 0xc17e
+		#phy1--come  addr:0x07 mdio:0
+		phyw 0 7 1e a000
+		phyw 0 7 1f 2
+		phyw 0 7 0 8140
+		phyw 0 7 1e a000
+		phyw 0 7 1f 0
+
+		#phy0--bmc   addr:0x03 mdio:0
+		phyw 0 3 1e a000
+		phyw 0 3 1f 2
+		phyw 0 3 1e a001
+		phyw 0 3 1f 8045
+		phyw 0 3 0 8140
+
+}
+
+
+
+reset_netswitch() {
+	cpld wr 0x30 0x0;
+	sleep 1;
+	cpld wr 0x30 0xf;
+}
+
+reset_copc_netswitch() {
+	i2cset -y -f 0 0x20 3  0x0f
+	sleep 1;
+	i2cset -y -f 0 0x20 3  0x0c
+}
+
+
+
+#ifconfig eth1 192.168.10.132
+echo "config net switch" >> /tmp/boot.log
+# reset_netswitch
+reset_copc_netswitch
+for idx in $(seq 1 5);do
+	netcfg_dsdt -board sdx_copc -slot $SLOT_ID >> /tmp/netcfg.log
+	if [ $? -ne 0 ];then
+		echo "config net switch failed trytime $idx" >> /tmp/boot.log
+		# reset_netswitch
+        reset_copc_netswitch
+        /script/sw_check.sh >> /tmp/mdio_check
+		usleep 10000
+	else
+		echo "config net switch success" >> /tmp/boot.log
+		break;
+	fi
+done
+if [ $idx -eq 5 ];then
+    echo "config net switch failed with all retry" >> /tmp/boot.log
+    /script/netcfg_later.sh
+else
+    #get board ID for config
+    # BOARD_ID=`cpld rd 0xfe00 | cut -d " " -f 2`
+    BOARD_ID=0
+    if [ $BOARD_ID -eq 12 ];then
+        config_net_lc02v1
+    elif [ $BOARD_ID -eq 13 ];then
+        config_net_lc02v2
+    elif [ $BOARD_ID -eq 14 ]; then
+        config_net_lc03
+    elif [ $BOARD_ID -eq 15 ]; then
+        config_net_lc03
+    elif [ $BOARD_ID -eq 21 ]; then
+        config_net_lcb
+        cpld wr 0x20 0x1f
+    elif [ $BOARD_ID -eq 0  ]; then
+	    config_net_copc
+    else
+        error_log "BOARD_ID $BOARD_ID ,phy no init" 
+    fi
+fi
+exit 0
+

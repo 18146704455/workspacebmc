@@ -1,0 +1,8 @@
+#filename	start_level		start_sequenc
+#insmod     S               05
+mountetc	S				12
+board_init  S               13
+#rm_shutdown.sh  S		16
+netcfg          S           96
+end_init    S               99
+

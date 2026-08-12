@@ -1,0 +1,312 @@
+/*********************************************************************************
+* Lattice Semiconductor Corp. Copyright 2000-2008
+*
+* This is the hardware.c of ispVME V12.1 for JTAG programmable devices.
+* All the functions requiring customization are organized into this file for
+* the convinience of porting.
+*********************************************************************************/
+/*********************************************************************************
+ * Revision History:
+ *
+ * 09/11/07 NN Type cast mismatch variables
+ * 09/24/07 NN Added calibration function.
+ *             Calibration will help to determine the system clock frequency
+ *             and the count value for one micro-second delay of the target
+ *             specific hardware.
+ *             Modified the ispVMDelay function
+ *             Removed Delay Percent support
+ *             Moved the sclock() function from ivm_core.c to hardware.c
+ *********************************************************************************/
+#include "vmopcode.h"
+#include <sys/io.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+//#define ISP_DEBUG
+#ifdef ISP_DEBUG
+#define DPRINTF(fmt, args...) printf(fmt, ##args);
+#else
+#define DPRINTF(FMT, args...)
+#endif
+/********************************************************************************
+* Declaration of global variables
+*
+*********************************************************************************/
+static volatile unsigned int *gpio_base;
+static volatile unsigned int *gpio_dir_base;
+static int mem_fd;
+static int mem_dir_fd;
+
+
+/*for GPIO JTAG*/
+static void *isp_gpio_map(unsigned int addr, int *fop)
+{
+    int fd;
+    void *base, *virt_addr;
+
+    fd = open("/dev/mem", O_RDWR | O_SYNC);
+    if(fd < 0) {
+        printf("open /dev/mem error!\n");
+        return NULL;
+    }
+    base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, addr & ~MAP_MASK);
+    if(base == (void *)-1) {
+        printf("map base is NULL!\n");
+        return NULL;
+    }
+    virt_addr = base + (addr & MAP_MASK);
+    *fop = fd;
+
+    return virt_addr;
+}
+static void isp_gpio_unmap(void *addr, int fd)
+{
+    munmap(addr, MAP_SIZE);
+    close(fd);
+}
+
+/*
+ * GPIOF0  --> JTAG_SEL
+ * GPIOM0  --> TMS
+ * GPIOM1  --> TDI
+ * GPIOM2  --> TCK
+ * GPIOM3  --> TDO
+ */
+ /*
+ * GPIOF2  --> JTAG_SEL
+ * GPIOL0  --> TMS
+ * GPIOL1  --> TDI
+ * GPIOL2  --> TCK
+ * GPIOL3  --> TDO
+ */
+int gpio_ctrl()
+{
+    volatile unsigned int *scu_base;
+    volatile unsigned int *lpc_base;
+     volatile unsigned int *strap_base;
+    unsigned int value;
+    int scu_fd, lpc_fd;
+    int strap_fd ;
+
+    /*get CPLD JTAG GPIO base address*/
+    scu_base = (volatile unsigned int *)isp_gpio_map(0x1e6e2000, &scu_fd);
+    lpc_base = (volatile unsigned int *)isp_gpio_map(SYSTEM_LPC_BASE_ADDR, &lpc_fd);
+    gpio_base = (volatile unsigned int *)isp_gpio_map(GPIOD_DATA_ADDR, &mem_fd);
+    gpio_dir_base = (volatile unsigned int *)isp_gpio_map(GPIOD_DIR_ADDR, &mem_dir_fd);
+    strap_base = (volatile unsigned int *)isp_gpio_map(0x1e6e2070, &strap_fd);
+
+    value = *(volatile unsigned int *)((char*)strap_base);
+    value &= ~(3 << 21);
+     *(volatile unsigned int *)((char*)strap_base) = value;
+     printf("strap 0x%x\n", value);
+
+	//scu90[1] = 0,disable other function
+	 value = *(volatile unsigned int *)((char*)scu_base + 0x90);
+	 value &= ~(1 << 1);
+	 *(volatile unsigned int *)((char*)scu_base + 0x90) = value;
+     printf("scu90 0x%x\n", value);
+	 
+	
+    //scu8c [8] = 0, GPIOL0-GPIOL4
+    value = *(volatile unsigned int *)((char*)scu_base + 0x8c);
+    printf("scu8c 0x%x\n", value);
+    value &= ~(0xf << 8);
+    *(volatile unsigned int *)((char*)scu_base + 0x8c) = value;
+    printf("scu8c 0x%x\n", value);
+
+
+    //scu80 [13:14] = 0, GPIOB5-GPIOB7
+    value = *(volatile unsigned int *)((char*)scu_base + 0x80);
+    value &= ~(3 << 13);
+    *(volatile unsigned int *)((char*)scu_base + 0x80) = value;
+    printf("scu80 0x%x\n", value);
+
+    //D1 output
+    value = *(volatile unsigned int *)gpio_dir_base;
+    printf("dir 0x%x\n", value);
+    value |= (0xff << 24);
+    value |= (7 << 13);
+    *(volatile unsigned int *)gpio_dir_base = value;
+    printf("dir 0x%x\n", value);
+
+    value = *(volatile unsigned int *)gpio_base;
+    while(0) {
+        value &= ~(0xff << 24);
+        value &= ~(7 << 13);
+        *(volatile unsigned int *)gpio_base = value;
+        printf("d1 value 0x%x\n", value);
+        sleep(1);
+        value |= (0xff << 24);
+        value |= (7 << 13);
+        *(volatile unsigned int *)gpio_base = value;
+        printf("d1 value 0x%x\n", value);
+        sleep(1);
+        
+    }
+
+    isp_gpio_unmap((void*)scu_base, scu_fd);
+    isp_gpio_unmap((void*)lpc_base, lpc_fd);
+    isp_gpio_unmap((void*)strap_base, strap_fd);
+    isp_gpio_unmap((void*)gpio_base, mem_fd);
+    isp_gpio_unmap((void*)gpio_dir_base, mem_dir_fd);
+    return 0;
+}
+
+
+int gpio_read_l(void)
+{
+    volatile unsigned int *scu_base;
+    volatile unsigned int *gpio_base;
+    unsigned int value;
+    int scu_fd;
+    /*get CPLD JTAG GPIO base address*/
+    scu_base = (volatile unsigned int *)isp_gpio_map(SYSTEM_SCU_BASE_ADDR, &scu_fd);
+    gpio_base = (volatile unsigned int *)isp_gpio_map(GPIOL_DATA_ADDR, &mem_fd);
+    gpio_dir_base = (volatile unsigned int *)isp_gpio_map(GPIOL_DIR_ADDR, &mem_dir_fd);
+
+
+    //scu90[5] = 0,disable other function
+     value = *(volatile unsigned int *)((char*)scu_base + SYSTEM_SCU90);
+     value &= ~(1 << 5);
+     *(volatile unsigned int *)((char*)scu_base + SYSTEM_SCU90) = value;
+     
+    //scu84 [16-20] = 0, GPIOL0-GPIOL4
+    value = *(volatile unsigned int *)((char*)scu_base + SYSTEM_SCU84);
+    value &= ~(0xf << 16);
+    *(volatile unsigned int *)((char*)scu_base + SYSTEM_SCU84) = value;
+
+    value = *(volatile unsigned int *)gpio_dir_base;
+    printf("dir 0x%x\n", value);
+    value &= ~((1 << 24) | (1 << 25) | (1 << 26) | (1 << 27));
+    *(volatile unsigned int *)gpio_dir_base = value;
+
+    /*GPIOL4 output 1 progaramar*/
+    value = *(volatile unsigned int *)gpio_base;
+    value = (value >> 24) & 0xf;
+    printf("GPIOL4 0x%x\n",value);
+
+    isp_gpio_unmap((void*)scu_base, scu_fd);
+    isp_gpio_unmap((void*)gpio_base, mem_fd);
+    isp_gpio_unmap((void*)gpio_dir_base, mem_dir_fd);
+
+    return 0;
+}
+
+//d0-7 out 1
+int gpio_D_0_7()
+{
+    volatile unsigned int *scu_base;
+    unsigned int value;
+    int scu_fd ;
+
+    /*get CPLD JTAG GPIO base address*/
+    scu_base = (volatile unsigned int *)isp_gpio_map(SYSTEM_SCU_BASE_ADDR, &scu_fd);
+    gpio_base = (volatile unsigned int *)isp_gpio_map(GPIOD_DATA_ADDR, &mem_fd);
+    gpio_dir_base = (volatile unsigned int *)isp_gpio_map(GPIOD_DIR_ADDR, &mem_dir_fd);
+#define SET_SCU_VALUE(addr) printf("%x old 0x%x\n",addr,*(volatile unsigned int *)((char*)scu_base + addr) ); *(volatile unsigned int *)((char*)scu_base + addr)
+        
+    //scu90[1] = 0
+    SET_SCU_VALUE(0x90) &= ~(1<<1);
+
+    //strap_base = 0
+    SET_SCU_VALUE(0x7C) |=(1<<21);
+    SET_SCU_VALUE(0x70) &=~(1<<21);
+    //scu8c[8-11] = 0
+    SET_SCU_VALUE(0x8c) &=~(0xf<<8);
+
+    //scuA8[20-23] = 0
+    SET_SCU_VALUE(0xa8) &=~(0xf<<20);
+#undef SET_SCU_VALUE
+
+    //GPIOD 0-7 out
+    value = *(volatile unsigned int *)gpio_dir_base;
+    printf("GPIOD dir 0x%x\n", value);
+    value |= (0xff<<24);
+    *(volatile unsigned int *)gpio_dir_base = value;
+
+    /*GPIOL4 output 1 progaramar*/
+    *(volatile unsigned int *)gpio_base &=  ~(0xff <<24);
+    printf("GPIOD 0x%x\n",*(volatile unsigned int *)gpio_base);
+
+    isp_gpio_unmap((void*)scu_base, scu_fd);
+    isp_gpio_unmap((void*)gpio_base, mem_fd);
+    isp_gpio_unmap((void*)gpio_dir_base, mem_dir_fd);
+    return 0;
+
+}
+int led_ctrl()
+{
+    volatile unsigned int *scu_base;
+    volatile unsigned int *lpc_base;
+    unsigned int value;
+    int scu_fd, lpc_fd;
+
+    /*get CPLD JTAG GPIO base address*/
+    scu_base = (volatile unsigned int *)isp_gpio_map(SYSTEM_SCU_BASE_ADDR, &scu_fd);
+    lpc_base = (volatile unsigned int *)isp_gpio_map(SYSTEM_LPC_BASE_ADDR, &lpc_fd);
+    gpio_base = (volatile unsigned int *)isp_gpio_map(GPION_DATA_ADDR, &mem_fd);
+    gpio_dir_base = (volatile unsigned int *)isp_gpio_map(GPION_DIR_ADDR, &mem_dir_fd);
+
+    //scu90[5] = 0,disable other function
+     value = *(volatile unsigned int *)((char*)scu_base + 0x90);
+     value &= ~(3 << 4);
+     *(volatile unsigned int *)((char*)scu_base + 0x90) = value;
+     printf("scu90 0x%x\n", value);
+     
+    //scu88 [5] = 0, GPIOL0-GPIOL4
+    value = *(volatile unsigned int *)((char*)scu_base + 0x88);
+    value &= ~(7 << 5);
+    *(volatile unsigned int *)((char*)scu_base + 0x88) = value;
+    printf("scu88 0x%x\n", value);
+
+    //scu8c[29] = 0, GPIOL0-GPIOL4
+    value = *(volatile unsigned int *)((char*)scu_base + 0x8c);
+    printf("scu8c 0x%x\n", value);
+    value &= ~(1 << 29);
+    *(volatile unsigned int *)((char*)scu_base + 0x8c) = value;
+    printf("scu8c 0x%x\n", value);
+
+    //scu94 [1:0] != 0, GPIOL0-GPIOL4
+    value = *(volatile unsigned int *)((char*)scu_base + 0x94);
+    value |= 3;
+    *(volatile unsigned int *)((char*)scu_base + 0x94) = value;
+    printf("scu94 0x%x\n", value);
+
+    //N5~7 output
+    value = *(volatile unsigned int *)gpio_dir_base;
+    printf("dir 0x%x\n", value);
+    value |= (7 << 8);
+    *(volatile unsigned int *)gpio_dir_base = value;
+    printf("dir 0x%x\n", value);
+
+    value = *(volatile unsigned int *)gpio_base;
+    printf("n5~7 value 0x%x\n", value);
+    value =(value & ~(7 << 8)) & ~(7 << 8);
+    *(volatile unsigned int *)gpio_base = value;
+    printf("n5~7 value 0x%x\n", *(volatile unsigned int *)gpio_base);
+    printf("n5~7 value 0x%x\n", value);
+
+    isp_gpio_unmap((void*)scu_base, scu_fd);
+    isp_gpio_unmap((void*)lpc_base, lpc_fd);
+    isp_gpio_unmap((void*)gpio_base, mem_fd);
+    isp_gpio_unmap((void*)gpio_dir_base, mem_dir_fd);
+
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    
+    printf("gpio ctrl\n");
+    //gpio_D_0_7();
+    //gpio_ctrl();
+    gpio_read_l();
+ //   led_ctrl();
+}
+

@@ -1,0 +1,8 @@
+#!/bin/bash
+slot_bit0=`cat /sys/class/gpio/gpio334/value |awk '{print}'`
+slot_bit1=`cat /sys/class/gpio/gpio333/value |awk '{print}'`
+slot_bit2=`cat /sys/class/gpio/gpio332/value |awk '{print}'`
+slot_bit3=`cat /sys/class/gpio/gpio320/value |awk '{print}'`
+slot_id_tmp=$slot_bit0$slot_bit1$slot_bit2$slot_bit3
+SLOT_ID="$((2#$slot_id_tmp))"
+echo $SLOT_ID

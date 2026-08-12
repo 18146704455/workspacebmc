@@ -1,0 +1,355 @@
+// SPDX-License-Identifier: GPL-2.0+
+// Copyright (c) 2018 Facebook Inc.
+/dts-v1/;
+
+#include "aspeed-g5.dtsi"
+
+/ {
+    model = "Scistor Backpack SCM BMC";
+    compatible = "facebook,cmm-bmc", "aspeed,ast2500";
+
+    aliases {
+        /*
+         * Override the default uart aliases to avoid breaking
+         * the legacy applications.
+         */
+        serial0 = &uart5;
+        serial1 = &uart1;
+        serial2 = &uart3;
+        serial3 = &uart4;
+
+        /*
+         * Hardcode the bus number of i2c switches' channels to
+         * avoid breaking the legacy applications.
+         */
+    };
+
+    chosen {
+        stdout-path = &uart5;
+        bootargs = "console=ttyS0,115200n8 root=/dev/ram rw earlyprintk";
+    };
+
+    memory@80000000 {
+        reg = <0x80000000 0x20000000>;
+    };
+};
+
+&pinctrl {
+	aspeed,external-nodes = <&gfx &lhc>;
+};
+
+/*
+ * Update reset type to "system" (full chip) to fix warm reboot hang issue
+ * when reset type is set to default ("soc", gated by reset mask registers).
+ */
+&wdt1 {
+	status = "okay";
+	aspeed,reset-type = "system";
+};
+
+/*
+ * wdt2 is not used by Backpack CMM.
+ */
+&wdt2 {
+	status = "disabled";
+};
+
+&fmc {
+	status = "okay";
+	flash@0 {
+		status = "okay";
+		m25p,fast-read;
+		label = "bmc";
+#include "facebook-bmc-flash-layout.dtsi"
+	};
+	flash@1 {
+		status = "okay";
+		m25p,fast-read;
+		label = "bmc1";
+#include "facebook-bmc-flash-layout1.dtsi"
+	};
+
+};
+&spi1{
+    compatible="aspeed,ast-spi";
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0=<&pinctrl_spi1_default 
+        &pinctrl_spi1cs1_default>;
+    spidev@0{
+        compatible="spidev";
+        reg = <0>;
+        spi-max-frequency=<50000000>;
+        status = "okay";
+    };
+};
+&spi2{
+    compatible="aspeed,ast-spi";
+    pinctrl-names = "default";
+    pinctrl-0=<&pinctrl_spi2ck_default
+        &pinctrl_spi2cs0_default 
+        &pinctrl_spi2miso_default
+        &pinctrl_spi2mosi_default>;
+    status = "okay";
+    spidev@0{
+        reg = < 0 >;
+        compatible="spidev";
+        spi-max-frequency=<50000000>;
+        status = "okay";
+    };
+};
+
+&uart1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_txd1_default
+		     &pinctrl_rxd1_default
+		     &pinctrl_ncts1_default
+		     &pinctrl_ndcd1_default
+		     &pinctrl_ndsr1_default
+		     &pinctrl_ndtr1_default
+		     &pinctrl_nrts1_default>;
+};
+
+&uart3 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_txd3_default
+		     &pinctrl_rxd3_default
+		     &pinctrl_ncts3_default
+		     &pinctrl_ndcd3_default
+		     &pinctrl_nri3_default>;
+};
+&lhc {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_lpchc_default>;
+    clocks = <&syscon ASPEED_CLK_LHCLK>;
+};
+/* 
+&uart4 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_txd4_default
+		     &pinctrl_rxd4_default>;
+};
+*/
+&uart5 {
+	status = "okay";
+};
+&mac0{
+    status = "okay";
+    no-hw-checksum;
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_rgmii1_default &pinctrl_mdio1_default>;
+};
+&mac1{
+    status = "okay";
+    speed = <1000>;// 100, 1000
+    duplex= <1>; // 0 1 
+    use-mode= "no_phy";// use-ncsi
+    no-hw-checksum;
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_rgmii2_default &pinctrl_mdio2_default>;
+};
+&apb{
+pcie: pcie_host_ctr@1e6ed000{
+          compatible = "aspeed,ast-pcie";
+          reg = <0x1e6ed000 0xd4>;
+      };
+p2x: apb_to_pcie@1e6f0000 {
+         compatible = "aspeed,ast2500-p2x";
+         reg = <0x1e6f0000 0x92>;
+
+     };
+};
+
+/*
+&mac0 {
+    #address-cells = <2>;
+    reg = <0x1e660000 0x180
+        0x1e680000 0x180>;
+
+    status = "okay";
+    no-hw-checksum;
+    set-mdio-base;
+    //use-mode= "no_phy"; use-ncsi 
+    //speed = <100>;// 100, 1000
+    //duplex= <1>; // 0 1 
+    clocks = <&syscon ASPEED_CLK_GATE_MAC1CLK > , < &syscon ASPEED_CLK_GATE_MAC2CLK >;
+    clock-names= "MAC", "MDIO";
+
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_rgmii1_default
+        &pinctrl_rgmii2_default &pinctrl_mdio2_default>;
+};
+*/
+/*
+ * I2C bus reserved for communication with COM-E.
+ */
+&i2c0 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+
+/*
+ * I2C bus to Line Cards and Fabric Cards.
+ */
+&2c1 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+
+/*
+ * I2C bus to Power Distribution Board.
+ */
+&i2c2 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+
+    24c64@50{
+        compatible="atmel,24c64";
+        reg=<0x50>;
+        //wp
+    };
+};
+
+/*
+ * I2c bus connected with temperature sensors on CMM.
+ */
+&i2c3 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+    tmp75@2a{
+        compatible="tmp75";
+        reg=<0x2a>;
+    };
+    tmp75@2e{
+        compatible="tmp75";
+        reg=<0x2e>;
+    };
+    tmp75@36{
+        compatible="tmp75";
+        reg=<0x36>;
+    };
+    tmp75@4d{
+        compatible="tmp75";
+        reg=<0x4d>;
+    };
+    tmp75@4e{
+        compatible="tmp75";
+        reg=<0x4e>;
+    };
+    max1617@2b{
+        compatible="max1617";
+        reg=<0x2b>;
+    };
+};
+
+/*
+ * I2C bus reserved for communication with COM-E.
+ */
+&i2c4 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+
+/*
+ * I2c bus connected with ADM1278.
+ */
+&i2c5 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+    ADM1278@10{
+        compatible="adm1278";
+        reg=<0x10>;
+    };
+};
+
+/*
+ * I2c bus connected with I/O Expander.
+ */
+&i2c6 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+
+/*
+ * I2c bus connected with I/O Expander and EPROMs.
+ */
+&i2c7 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+    tps53667@60{
+        compatible="tps53667";
+        reg=<0x60>;
+    };
+};
+
+/*
+ * I2C bus to Fan Control Board.
+ */
+&i2c8 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+&i2c9 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+&i2c10 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+&i2c11 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+    IR35215@47{
+        compatible="ir35215";
+        reg=<0x47>;
+    };
+};
+/**/
+&i2c12 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+/*
+ * I2C bus to CMM CPLD.
+ */
+&i2c13 {
+	status = "okay";
+	base-clock-divisor = <4>;
+	clock-low-width = <7>;
+	clock-high-width = <7>;
+};
+
+&adc {
+	status = "okay";
+};
+

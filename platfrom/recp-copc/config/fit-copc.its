@@ -1,0 +1,44 @@
+/dts-v1/;
+
+/ {
+        description = "U-Boot fitImage for SCISTOR BMC_V1-1-0";
+        #address-cells = <1>;
+
+    images {
+        kernel1 {
+            description = "Linux kernel";
+            data = /incbin/("/REPLACE/zImage");
+            type = "kernel";
+            arch = "arm";
+            os = "linux";
+            compression = "none";
+            load = <0x80008000>;
+            entry = <0x80008000>;
+        };
+        ramdisk1 {
+            description = "RAMDISK";
+            data = /incbin/("/REPLACE/rootfs.cpio.lzma");
+            type = "ramdisk";
+            arch = "arm";
+            os = "linux";
+            compression = "lzma";
+        };
+        fdt1 {
+            description = "Flattened Device Tree blob";
+            data = /incbin/("/REPLACE/TMPDTBNAME");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+        };
+    };
+
+    configurations {
+        default = "conf1";
+        conf1 {
+            description = "Boot Linux kernel with ramdisk and device tree blob";
+            kernel = "kernel1";
+            ramdisk = "ramdisk1";
+            fdt = "fdt1";
+        };
+    };
+};

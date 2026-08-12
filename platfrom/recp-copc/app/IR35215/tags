@@ -1,0 +1,118 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AR	Makefile	/^AR      = $(CROSS_COMPILE)ar$/;"	m
+ARRAY_SIZE	command.h	14;"	d
+CC	Makefile	/^CC      = $(CROSS_COMPILE)gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS  = -Wall -Werror -std=gnu99 -fPIC$/;"	m
+CMD_FLAG_REPEAT	parser_line.h	11;"	d
+CMD_RET_FAILURE	command.h	/^	CMD_RET_FAILURE,	\/* 1 = Failure *\/$/;"	e	enum:command_ret_t
+CMD_RET_SUCCESS	command.h	/^	CMD_RET_SUCCESS,	\/* 0 = Success *\/$/;"	e	enum:command_ret_t
+CMD_RET_USAGE	command.h	/^	CMD_RET_USAGE = -1,	\/* Failure, please report 'usage' error *\/$/;"	e	enum:command_ret_t
+CONFIG_AUTO_COMPLETE	command.h	23;"	d
+CONFIG_SYS_CBSIZE	parser_line.h	7;"	d
+CONFIG_SYS_MAXARGS	parser_line.h	8;"	d
+DB_CURR_LEVEL	common.h	9;"	d
+DB_CURR_LEVEL	i2cctrl.c	16;"	d	file:
+DB_CURR_LEVEL	i2cctrl.c	17;"	d	file:
+DB_CURR_LEVEL	parser_line.c	11;"	d	file:
+DB_CURR_LEVEL	parser_line.c	12;"	d	file:
+DB_CURR_LEVEL	plx8619.c	19;"	d	file:
+DB_CURR_LEVEL	plx8619.c	20;"	d	file:
+DB_DEBUG	common.h	5;"	d
+DB_ERR	common.h	7;"	d
+DB_FATAL	common.h	8;"	d
+DB_INFO	common.h	6;"	d
+DB_PRINT	common.h	11;"	d
+DEV_FD_IS_INIT	i2cctrl.h	22;"	d
+I2C_API_VERSION	smbus.h	26;"	d
+I2C_BUS_5	i2cctrl.h	17;"	d
+I2C_BUS	i2cctrl.h	16;"	d
+I2C_FUNC_SMBUS_PEC	smbus.c	36;"	d	file:
+I2C_SMBUS_I2C_BLOCK_BROKEN	smbus.c	33;"	d	file:
+LD	Makefile	/^LD      = $(CROSS_COMPILE)ld$/;"	m
+LIB_I2C_SMBUS_H	smbus.h	24;"	d
+MAIN_OBJS	Makefile	/^MAIN_OBJS = i2cctrl.o  smbus.o command.o plx8619.o devctrl_main.o parser_line.o$/;"	m
+PEX_BLOC_READ_CMD	plx8619.c	29;"	d	file:
+PEX_BLOC_WRITE_CMD	plx8619.c	28;"	d	file:
+PEX_READ_CMD	plx8619.c	26;"	d	file:
+PEX_WRITE_CMD	plx8619.c	25;"	d	file:
+PLX8619_I2C_ADDR	plx8619.c	23;"	d	file:
+PROMPT_STR	parser_line.h	9;"	d
+REG_LANE_STATUS	plx8619.c	32;"	d	file:
+__COMMAND_H	command.h	12;"	d
+__COMMON_H__	common.h	2;"	d
+__I2C_CTRL_H__	i2cctrl.h	2;"	d
+__PARSER_LINE_H__	parser_line.h	2;"	d
+__PEX8725_H__	plx8619.h	2;"	d
+builtin_run_command	parser_line.c	/^static int builtin_run_command(const char *cmd, int flag)$/;"	f	file:
+close_dev	i2cctrl.c	/^void close_dev(int fd)$/;"	f
+cmd	command.h	/^	int		(*cmd)(struct cmd_tbl_s *, int, int, char * const []);$/;"	m	struct:cmd_tbl_s
+cmd_auto_complete	parser_line.c	/^int cmd_auto_complete(const char *const prompt, char *buf, int *np, int *colp)$/;"	f
+cmd_call	command.c	/^static int cmd_call(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])$/;"	f	file:
+cmd_pex_sub	devctrl_main.c	/^cmd_tbl_t cmd_pex_sub[] = $/;"	v
+cmd_process	command.c	/^enum command_ret_t cmd_process(int flag, int argc, char * const argv[], cmd_tbl_t *cmd_tables,int table_len)$/;"	f
+cmd_tables	devctrl_main.c	/^cmd_tbl_t cmd_tables[] = {$/;"	v
+cmd_tables_len	devctrl_main.c	/^int cmd_tables_len = ARRAY_SIZE(cmd_tables);$/;"	v
+cmd_tbl_s	command.h	/^struct cmd_tbl_s {$/;"	s
+cmd_tbl_t	command.h	/^typedef struct cmd_tbl_s	cmd_tbl_t;$/;"	t	typeref:struct:cmd_tbl_s
+cmd_usage	command.c	/^void cmd_usage(const cmd_tbl_t *cmdtp)$/;"	f
+command_ret_t	command.h	/^enum command_ret_t {$/;"	g
+complete	command.h	/^	int		(*complete)(int argc, char * const argv[], char last_char, int maxv, char *cmdv[]);$/;"	m	struct:cmd_tbl_s
+complete_cmdv	parser_line.c	/^int complete_cmdv(int argc, char * const argv[], char last_char, int maxv, char *cmdv[])$/;"	f
+console_buffer	parser_line.c	/^char  console_buffer[CONFIG_SYS_CBSIZE + 1];	\/* console I\/O buffer	*\/$/;"	v
+deinit_i2cctrl	i2cctrl.c	/^void deinit_i2cctrl()$/;"	f
+delete_char	parser_line.c	/^static char * delete_char (char *buffer, char *p, int *colp, int *np, int plen)$/;"	f	file:
+erase_seq	parser_line.c	/^static const char erase_seq[] = "\\b \\b";		\/* erase sequence	*\/$/;"	v	file:
+find_cmd_tbl	command.c	/^cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)$/;"	f
+find_common_prefix	parser_line.c	/^static int find_common_prefix(char * const argv[])$/;"	f	file:
+g_i2c_fd	i2cctrl.c	/^int g_i2c_fd = -1;$/;"	v
+help	command.h	/^	void	(*help)(void);		\/* Help  message	(long)	*\/$/;"	m	struct:cmd_tbl_s
+help_cmd	devctrl_main.c	/^int help_cmd(struct cmd_tbl_s *cmd_tbl, int flag, int argc, char * const argv[])$/;"	f
+i2c_smbus_access	smbus.c	/^__s32 i2c_smbus_access(int file, char read_write, __u8 command,$/;"	f
+i2c_smbus_block_process_call	smbus.c	/^__s32 i2c_smbus_block_process_call(int file, __u8 command, __u8 length,$/;"	f
+i2c_smbus_process_call	smbus.c	/^__s32 i2c_smbus_process_call(int file, __u8 command, __u16 value)$/;"	f
+i2c_smbus_read_block_data	smbus.c	/^__s32 i2c_smbus_read_block_data(int file, __u8 command, __u8 *values)$/;"	f
+i2c_smbus_read_byte	smbus.c	/^__s32 i2c_smbus_read_byte(int file)$/;"	f
+i2c_smbus_read_byte_data	smbus.c	/^__s32 i2c_smbus_read_byte_data(int file, __u8 command)$/;"	f
+i2c_smbus_read_i2c_block_data	smbus.c	/^__s32 i2c_smbus_read_i2c_block_data(int file, __u8 command, __u8 length,$/;"	f
+i2c_smbus_read_word_data	smbus.c	/^__s32 i2c_smbus_read_word_data(int file, __u8 command)$/;"	f
+i2c_smbus_write_block_data	smbus.c	/^__s32 i2c_smbus_write_block_data(int file, __u8 command, __u8 length,$/;"	f
+i2c_smbus_write_byte	smbus.c	/^__s32 i2c_smbus_write_byte(int file, __u8 value)$/;"	f
+i2c_smbus_write_byte_data	smbus.c	/^__s32 i2c_smbus_write_byte_data(int file, __u8 command, __u8 value)$/;"	f
+i2c_smbus_write_i2c_block_data	smbus.c	/^__s32 i2c_smbus_write_i2c_block_data(int file, __u8 command, __u8 length,$/;"	f
+i2c_smbus_write_quick	smbus.c	/^__s32 i2c_smbus_write_quick(int file, __u8 value)$/;"	f
+i2c_smbus_write_word_data	smbus.c	/^__s32 i2c_smbus_write_word_data(int file, __u8 command, __u16 value)$/;"	f
+init	command.h	/^    int		(*init)(void *args);$/;"	m	struct:cmd_tbl_s
+init_flag	command.h	/^    int init_flag;$/;"	m	struct:cmd_tbl_s
+init_i2cctrl	i2cctrl.c	/^int init_i2cctrl()$/;"	f
+main	devctrl_main.c	/^int main(int argc, char* argv[])$/;"	f
+main_loop	parser_line.c	/^int main_loop()$/;"	f
+make_argv	parser_line.c	/^int make_argv(char *s, int argvsz, char *argv[])$/;"	f
+maxargs	command.h	/^	int		maxargs;	\/* maximum number of arguments	*\/$/;"	m	struct:cmd_tbl_s
+name	command.h	/^	char	*name;		\/* Command Name			*\/$/;"	m	struct:cmd_tbl_s
+open_dev	i2cctrl.c	/^int open_dev(char *devname)$/;"	f
+parse_line	parser_line.c	/^int parse_line (char *line, char *argv[])$/;"	f
+pex_cmd	devctrl_main.c	/^int pex_cmd(struct cmd_tbl_s *cmd_tbl, int flag, int argc, char * const argv[])$/;"	f
+pex_cmd_read	devctrl_main.c	/^int pex_cmd_read(struct cmd_tbl_s *cmd_tbl, int flag, int argc, char * const argv[])$/;"	f
+pex_cmd_write	devctrl_main.c	/^int pex_cmd_write(struct cmd_tbl_s *cmd_tbl, int flag, int argc, char * const argv[])$/;"	f
+pex_init	devctrl_main.c	/^int pex_init(void* argv)$/;"	f
+pex_print_usage	devctrl_main.c	/^void pex_print_usage(void)$/;"	f
+pex_set_i2c_slave_addr	devctrl_main.c	/^int pex_set_i2c_slave_addr(struct cmd_tbl_s *cmd_tbl, int flag, int argc, char * const argv[])$/;"	f
+plx8619_i2caddr	plx8619.c	/^static unsigned char plx8619_i2caddr = (unsigned char)0x3f;$/;"	v	file:
+plx8619_read	plx8619.c	/^int plx8619_read(unsigned char port, unsigned short reg,unsigned int *data)$/;"	f
+plx8619_set_i2c_addr	plx8619.c	/^int plx8619_set_i2c_addr(unsigned char addr)$/;"	f
+plx8619_write	plx8619.c	/^int plx8619_write(unsigned char port, unsigned short reg,unsigned int data)$/;"	f
+print_argv	parser_line.c	/^static void print_argv(const char *banner, const char *leader, const char *sep, int linemax, char * const argv[])$/;"	f	file:
+readline	parser_line.c	/^int readline (const char *const prompt)$/;"	f
+readline_into_buffer	parser_line.c	/^int readline_into_buffer(const char *const prompt, char *buffer, int timeout)$/;"	f
+repeatable	command.h	/^	int		repeatable;	\/* autorepeat allowed?		*\/$/;"	m	struct:cmd_tbl_s
+reversebytes_uint32t	plx8619.c	/^unsigned int reversebytes_uint32t(unsigned int value)$/;"	f
+run_command	parser_line.c	/^int run_command(const char *cmd, int flag)$/;"	f
+set_addr	i2cctrl.c	/^int set_addr(int fd,int addr)$/;"	f
+tab_seq	parser_line.c	/^static const char   tab_seq[] = "        ";		\/* used to expand TABs	*\/$/;"	v	file:
+tmp_buf	parser_line.c	/^static char tmp_buf[CONFIG_SYS_CBSIZE];	\/* copy of console I\/O buffer	*\/$/;"	v	file:
+usage	command.h	/^    char		*usage;		\/* short msg	*\/$/;"	m	struct:cmd_tbl_s

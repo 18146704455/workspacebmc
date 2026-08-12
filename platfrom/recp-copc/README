@@ -1,0 +1,3 @@
+[NET]
+    BUS0 phy_addr 0x10 debug口
+    BUS1
