@@ -1,0 +1,7 @@
+/* Generated automatically. */
+static const char configuration_arguments[] = "/home/toolchains/.build/arm-xarh-linux-gnueabi/src/gcc/configure --build=x86_64-build_pc-linux-gnu --host=x86_64-build_pc-linux-gnu --target=arm-xarh-linux-gnueabi --prefix=/home/toolchains/x-tools/arm-xarh-linux-gnueabi --with-sysroot=/home/toolchains/x-tools/arm-xarh-linux-gnueabi/arm-xarh-linux-gnueabi/sysroot --enable-languages=c,c++ --with-float=soft --with-pkgversion='crosstool-NG 1.23.0.582-e215e3a' --disable-sjlj-exceptions --enable-__cxa_atexit --disable-libmudflap --disable-libgomp --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-libsanitizer --disable-libmpx --with-gmp=/home/toolchains/.build/arm-xarh-linux-gnueabi/buildtools --with-mpfr=/home/toolchains/.build/arm-xarh-linux-gnueabi/buildtools --with-mpc=/home/toolchains/.build/arm-xarh-linux-gnueabi/buildtools --with-isl=/home/toolchains/.build/arm-xarh-linux-gnueabi/buildtools --enable-lto --with-host-libstdcxx='-static-libgcc -Wl,-Bstatic,-lstdc++,-Bdynamic -lm' --enable-threads=posix --enable-target-optspace --enable-plugin --enable-gold --disable-nls --disable-multilib --with-local-prefix=/home/toolchains/x-tools/arm-xarh-linux-gnueabi/arm-xarh-linux-gnueabi/sysroot --enable-long-long";
+static const char thread_model[] = "posix";
+
+static const struct {
+  const char *name, *value;
+} configure_default_options[] = { { "float", "soft" }, { "tls", "gnu" } };

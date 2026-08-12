@@ -1,0 +1,6 @@
+python
+import sys
+sys.path.insert(0, '/home/toolchains/x-tools/arm-xarh-linux-gnueabi/share/gcc-5.5.0/python')
+from libstdcxx.v6.printers import register_libstdcxx_printers
+register_libstdcxx_printers (None)
+end
